@@ -1,7 +1,7 @@
 package com.refactoring.excercise
 
 import org.junit.Test
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 
 /**
  * Unit tests for the CounterViewModel.
