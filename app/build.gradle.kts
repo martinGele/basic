@@ -1,3 +1,6 @@
+import com.android.zipflinger.Sources.dir
+import org.apache.tools.ant.types.resources.MultiRootFileSet
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -54,7 +57,7 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
     }
 
     classDirectories.setFrom(
-        fileTree(dir: "${project.buildDir}/tmp/kotlin-classes/debug") {
+        fileTree(MultiRootFileSet.SetType.dir: "${project.buildDir}/tmp/kotlin-classes/debug") {
             exclude("**/R.class", "**/R$*.class", "**/BuildConfig.class", "**/Manifest*.*")
         }
     )
