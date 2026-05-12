@@ -1,0 +1,6 @@
+---
+blank_issues_enabled: false
+contact_links:
+  - name: CI/CD Documentation
+    url: https://github.com/your-username/Refactoring/blob/main/GITHUB_CI_CD.md
+    about: Complete documentation for CI/CD pipeline and workflows
