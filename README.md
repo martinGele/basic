@@ -15,8 +15,15 @@ This project uses GitHub Actions for continuous integration and continuous deplo
     - Sets up JDK 17 with Gradle caching.
     - Grants execute permission to `gradlew`.
     - Runs unit tests using `./gradlew test`.
+    - Checks code formatting with Spotless (using ktlint).
+    - Generates Jacoco test coverage reports.
     - Builds the debug APK using `./gradlew assembleDebug`.
-    - Uploads the debug APK as a build artifact.
+    - Uploads the debug APK and coverage reports as build artifacts.
+
+### Code Quality Tools
+
+- **Spotless**: Ensures consistent code formatting across Kotlin and Gradle files using ktlint rules.
+- **Jacoco**: Generates test coverage reports in HTML and XML formats.
 
 ### How to Use
 
