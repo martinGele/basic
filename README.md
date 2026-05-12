@@ -1,35 +1,159 @@
 # Refactoring Exercise Android App
 
-This is an Android application built with Kotlin and Jetpack Compose.
+A modern Android application built with **Kotlin** and **Jetpack Compose**, featuring a comprehensive CI/CD pipeline with automated testing, code quality checks, and release management.
 
-## CI/CD Pipeline
+## 📱 Features
 
-This project uses GitHub Actions for continuous integration and continuous deployment.
+- Modern Kotlin/Compose UI
+- Counter functionality with ViewModel
+- Comprehensive unit tests
+- Automated CI/CD with GitHub Actions
+- Code formatting and quality checks
+- Test coverage reporting
+- Security scanning
+- Automated releases
 
-### Workflow: Android CI/CD
+## 📚 Documentation
 
-- **Triggers**: Runs on push and pull requests to `main` or `master` branches.
-- **Jobs**:
-  - **Build and Test**:
-    - Checks out the code.
-    - Sets up JDK 17 with Gradle caching.
-    - Grants execute permission to `gradlew`.
-    - Runs unit tests using `./gradlew test`.
-    - Checks code formatting with Spotless (using ktlint).
-    - Generates Jacoco test coverage reports.
-    - Builds the debug APK using `./gradlew assembleDebug`.
-    - Uploads the debug APK and coverage reports as build artifacts.
+### Quick Links
 
-### Code Quality Tools
+- **[GITHUB_CI_CD.md](./GITHUB_CI_CD.md)** - Complete guide to GitHub Actions workflows and CI/CD infrastructure
+- **[CI_CD_GUIDE.md](./CI_CD_GUIDE.md)** - Detailed guide for local development and troubleshooting
 
-- **Spotless**: Ensures consistent code formatting across Kotlin and Gradle files using ktlint rules.
-- **Jacoco**: Generates test coverage reports in HTML and XML formats.
+### For GitHub-ReadyConfig
 
-### How to Use
+See [GITHUB_CI_CD.md](./GITHUB_CI_CD.md) for:
+- Workflow descriptions
+- How to trigger releases
+- Where to view results
+- Security scanning details
+- Troubleshooting guide
 
-1. Push your changes to the `main` or `master` branch.
-2. The workflow will automatically run, building and testing your app.
-3. Check the Actions tab in GitHub for the build status.
-4. Download build artifacts from the workflow runs if needed.
+## 🔄 CI/CD Pipeline Overview
 
-For deployment to Google Play or other stores, additional steps and secrets would be required.
+This project uses **GitHub Actions** for comprehensive continuous integration and deployment.
+
+### Main Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| **Android CI/CD** | Push/PR to main | Build, test, format check, coverage |
+| **Security Scan** | Push/PR/Daily | Vulnerability scanning with Trivy |
+| **Lint & Analysis** | Push/PR | Code quality and Android Lint |
+| **Release Build** | Version tags (v*) | Release APK creation |
+
+### Quick Start
+
+```bash
+# Format and test locally
+./gradlew spotlessApply test
+
+# Push to trigger CI/CD
+git push origin main
+
+# Create a release
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+## 🛠️ Code Quality Tools
+
+### Spotless (Code Formatting)
+- Ensures consistent Kotlin code style
+- Uses ktlint formatter
+- Integrated in all workflows
+- Local commands:
+  ```bash
+  ./gradlew spotlessApply   # Auto-fix formatting
+  ./gradlew spotlessCheck   # Check without fixing
+  ```
+
+### Jacoco (Test Coverage)
+- Measures code coverage per test run
+- Generates HTML reports
+- Local command:
+  ```bash
+  ./gradlew jacocoTestReport
+  ```
+
+### Android Lint
+- Static analysis for Android issues
+- Runs automatically in CI
+- Local command:
+  ```bash
+  ./gradlew lint
+  ```
+
+## 📊 Project Structure
+
+```
+app/src/
+├── main/
+│   └── java/com/refactoring/excercise/
+│       ├── MainActivity.kt          # Main UI with Compose
+│       ├── CounterViewModel.kt      # Counter business logic
+│       └── ui/theme/                # Theme configuration
+└── test/
+    └── java/com/refactoring/excercise/
+        └── CounterViewModelTest.kt  # Unit tests
+```
+
+## ✅ Running Locally
+
+Before pushing your changes:
+
+```bash
+# Format code
+./gradlew spotlessApply
+
+# Run tests
+./gradlew test
+
+# Check code quality
+./gradlew spotlessCheck lint
+
+# Generate coverage report
+./gradlew jacocoTestReport
+
+# Build debug APK
+./gradlew assembleDebug
+```
+
+## 📖 CI/CD Details
+
+For comprehensive information about the CI/CD infrastructure, see:
+
+1. **[GITHUB_CI_CD.md](./GITHUB_CI_CD.md)** - Main documentation
+   - All workflow explanations
+   - How to trigger each workflow
+   - Where to view results
+   - Troubleshooting
+
+2. **[CI_CD_GUIDE.md](./CI_CD_GUIDE.md)** - Developer guide
+   - Local setup instructions
+   - Common workflows
+   - Code quality tool details
+   - Future enhancements
+
+## 🚀 Making a Release
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+# Automated release build starts
+# Download APK from GitHub Releases
+```
+
+## 🔒 Security
+
+- Trivy vulnerability scanner runs on every push
+- Results available in GitHub Security tab
+- Daily automated scans scheduled
+
+## 🐛 Troubleshooting
+
+See [GITHUB_CI_CD.md - Troubleshooting](./GITHUB_CI_CD.md#troubleshooting) for common issues and solutions.
+
+---
+
+For deployment to Google Play or other stores, see future enhancements in [GITHUB_CI_CD.md](./GITHUB_CI_CD.md#future-enhancements).
