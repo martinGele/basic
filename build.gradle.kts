@@ -8,10 +8,18 @@ plugins {
 spotless {
     kotlin {
         target("**/*.kt")
-        ktlint().editorConfigOverride(mapOf("indent_size" to "4", "continuation_indent_size" to "4"))
+        targetExclude("**/build/**", "**/generated/**")
+        ktlint().editorConfigOverride(
+            mapOf(
+                "indent_size" to "4",
+                "continuation_indent_size" to "4",
+                "ktlint_standard_function-naming" to "disabled",
+            ),
+        )
     }
     kotlinGradle {
         target("**/*.gradle.kts")
+        targetExclude("**/build/**")
         ktlint().editorConfigOverride(mapOf("indent_size" to "4", "continuation_indent_size" to "4"))
     }
 }
