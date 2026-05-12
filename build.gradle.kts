@@ -2,4 +2,16 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.spotless) apply false
+}
+
+spotless {
+    kotlin {
+        target("**/*.kt")
+        ktlint().editorConfigOverride(mapOf("indent_size" to "4", "continuation_indent_size" to "4"))
+    }
+    kotlinGradle {
+        target("**/*.gradle.kts")
+        ktlint()
+    }
 }

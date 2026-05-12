@@ -27,6 +27,12 @@ jobs:
     - name: Run unit tests
       run: ./gradlew test
 
+    - name: Check code formatting with Spotless
+      run: ./gradlew spotlessCheck
+
+    - name: Generate Jacoco test coverage report
+      run: ./gradlew jacocoTestReport
+
     - name: Build debug APK
       run: ./gradlew assembleDebug
 
@@ -35,3 +41,9 @@ jobs:
       with:
         name: debug-apk
         path: app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: app/build/reports/jacoco/jacocoTestReport/
