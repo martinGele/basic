@@ -24,8 +24,7 @@ class MoneyTransferServiceTest {
         logger = logger,
     )
 
-    private fun money(amount: String, currency: Currency = Currency.EUR) =
-        Money(BigDecimal(amount), currency)
+    private fun money(amount: String, currency: Currency = Currency.EUR) = Money(BigDecimal(amount), currency)
 
     private fun request(
         amount: Money = money("100.00"),

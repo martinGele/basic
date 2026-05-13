@@ -17,6 +17,5 @@ data class Money(val amount: BigDecimal, val currency: Currency) {
 
     fun isPositive(): Boolean = amount.signum() > 0
 
-    override fun toString(): String =
-        "${amount.setScale(2, RoundingMode.HALF_UP)} $currency"
+    override fun toString(): String = "${amount.setScale(2, RoundingMode.HALF_UP)} $currency"
 }

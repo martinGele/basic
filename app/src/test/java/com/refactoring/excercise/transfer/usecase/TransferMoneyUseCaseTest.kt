@@ -32,8 +32,7 @@ class TransferMoneyUseCaseTest {
         logger = Logger {},
     )
 
-    private fun money(amount: String, currency: Currency = Currency.EUR) =
-        Money(BigDecimal(amount), currency)
+    private fun money(amount: String, currency: Currency = Currency.EUR) = Money(BigDecimal(amount), currency)
 
     private class FakeAccountRepository(initialBalance: Money) : AccountRepository {
         private val balanceState = MutableStateFlow(initialBalance)

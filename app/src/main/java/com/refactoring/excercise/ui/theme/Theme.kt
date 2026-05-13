@@ -46,6 +46,7 @@ fun RefactoringTheme(
         }
 
         darkTheme -> DarkColorScheme
+
         else -> LightColorScheme
     }
 

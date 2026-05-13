@@ -24,8 +24,7 @@ object TransferModule {
 
     @Provides
     @Singleton
-    fun provideAccountRepository(): AccountRepository =
-        InMemoryAccountRepository(Money(BigDecimal("1000.00"), Currency.EUR))
+    fun provideAccountRepository(): AccountRepository = InMemoryAccountRepository(Money(BigDecimal("1000.00"), Currency.EUR))
 
     @Provides
     @Singleton

@@ -127,7 +127,9 @@ private fun ResultBanner(result: TransferState.ResultBanner) {
     val text = when (result) {
         is TransferState.ResultBanner.Success ->
             "Sent! tx#${result.transactionId} • total ${result.total}"
+
         TransferState.ResultBanner.InvalidAmount -> "Enter a valid amount"
+
         TransferState.ResultBanner.InsufficientFunds -> "Insufficient funds"
     }
     Text(text, style = MaterialTheme.typography.bodyLarge)

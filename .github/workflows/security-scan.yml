@@ -7,11 +7,16 @@ on:
   schedule:
     - cron: '0 2 * * *'
 jobs:
-  security-check:
+  analyze:
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       contents: read
       security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'java-kotlin' ]
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -23,16 +28,14 @@ jobs:
         cache: gradle
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@0.28.0
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
       with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-        exit-code: '0'
-    - name: Upload Trivy results to GitHub Security
-      if: always()
-      uses: github/codeql-action/upload-sarif@v4
+        languages: ${{ matrix.language }}
+        queries: security-and-quality
+    - name: Build
+      run: ./gradlew assembleDebug --no-daemon
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
       with:
-        sarif_file: 'trivy-results.sarif'
+        category: "/language:${{ matrix.language }}"
