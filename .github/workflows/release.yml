@@ -60,7 +60,7 @@ jobs:
         git tag -a "v${{ steps.version.outputs.version_name }}" -m "Release v${{ steps.version.outputs.version_name }}"
         git push origin "v${{ steps.version.outputs.version_name }}"
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: v${{ steps.version.outputs.version_name }}
         files: app/build/outputs/bundle/release/app-release.aab
