@@ -1,0 +1,14 @@
+package com.refactoring.excercise.transfer.repository
+
+import com.refactoring.excercise.transfer.model.Money
+import com.refactoring.excercise.transfer.model.TransferResult
+import kotlinx.coroutines.flow.Flow
+
+interface AccountRepository {
+
+    suspend fun getBalance(accountId: String): Money
+
+    fun observeBalance(accountId: String): Flow<Money>
+
+    suspend fun recordTransfer(result: TransferResult.Success)
+}
