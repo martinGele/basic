@@ -121,7 +121,7 @@ jobs:
         git tag -a "v${{ needs.build-release.outputs.version_name }}" -m "Release v${{ needs.build-release.outputs.version_name }}"
         git push origin "v${{ needs.build-release.outputs.version_name }}"
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+      uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
       with:
         tag_name: v${{ needs.build-release.outputs.version_name }}
         files: |
