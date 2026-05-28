@@ -10,14 +10,18 @@ jobs:
   build-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
+      version_code: ${{ steps.version.outputs.version_code }}
+      aab_hashes: ${{ steps.hash.outputs.hashes }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       with:
         fetch-depth: 0
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -35,7 +39,7 @@ jobs:
     - name: Decode keystore
       run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $RUNNER_TEMP/release.keystore
     - name: Run tests
-      run: ./gradlew test
+      run: ./gradlew test jacocoTestCoverageVerification
     - name: Build release AAB
       env:
         KEYSTORE_PATH: ${{ runner.temp }}/release.keystore
@@ -44,32 +48,87 @@ jobs:
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         VERSION_CODE: ${{ steps.version.outputs.version_code }}
         VERSION_NAME: ${{ steps.version.outputs.version_name }}
-      run: ./gradlew bundleRelease
+      run: ./gradlew :app:bundleRelease
+    - name: Generate CycloneDX SBOM
+      run: ./gradlew :app:cyclonedxBom
+    - name: Stage release artifacts
+      run: |
+        mkdir -p release-artifacts
+        cp app/build/outputs/bundle/release/app-release.aab release-artifacts/
+        if [ -f app/build/reports/bom.json ]; then
+          cp app/build/reports/bom.json release-artifacts/app-release.cdx.json
+        fi
+        if [ -f app/build/reports/bom.xml ]; then
+          cp app/build/reports/bom.xml release-artifacts/app-release.cdx.xml
+        fi
+        ls -la release-artifacts/
+    - name: Hash AAB for provenance
+      id: hash
+      working-directory: release-artifacts
+      run: |
+        echo "hashes=$(sha256sum app-release.aab | base64 -w0)" >> "$GITHUB_OUTPUT"
+    - name: Upload release artifacts
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: release-artifacts
+        path: release-artifacts/
+        retention-days: 14
+
+  provenance:
+    needs: [build-release]
+    permissions:
+      actions: read
+      id-token: write
+      contents: write
+    # SLSA reusable workflow MUST be referenced by a semver tag (not SHA)
+    # because OIDC verification is bound to the tag identity.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
+    with:
+      base64-subjects: "${{ needs.build-release.outputs.aab_hashes }}"
+      provenance-name: "app-release.aab.intoto.jsonl"
+      upload-assets: false
+
+  publish:
+    needs: [build-release, provenance]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+    - name: Download release artifacts
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        name: release-artifacts
+        path: release-artifacts
+    - name: Download SLSA provenance
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        name: ${{ needs.provenance.outputs.provenance-name }}
+        path: release-artifacts
     - name: Upload to Google Play
-      uses: r0adkll/upload-google-play@v1
+      uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
       with:
         serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
         packageName: com.refactoring.excercise
-        releaseFiles: app/build/outputs/bundle/release/app-release.aab
+        releaseFiles: release-artifacts/app-release.aab
         track: internal
         status: completed
     - name: Tag release
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git tag -a "v${{ steps.version.outputs.version_name }}" -m "Release v${{ steps.version.outputs.version_name }}"
-        git push origin "v${{ steps.version.outputs.version_name }}"
+        git tag -a "v${{ needs.build-release.outputs.version_name }}" -m "Release v${{ needs.build-release.outputs.version_name }}"
+        git push origin "v${{ needs.build-release.outputs.version_name }}"
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
       with:
-        tag_name: v${{ steps.version.outputs.version_name }}
-        files: app/build/outputs/bundle/release/app-release.aab
+        tag_name: v${{ needs.build-release.outputs.version_name }}
+        files: |
+          release-artifacts/app-release.aab
+          release-artifacts/app-release.cdx.*
+          release-artifacts/app-release.aab.intoto.jsonl
         draft: false
         prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload release artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: release-aab-${{ steps.version.outputs.version_name }}
-        path: app/build/outputs/bundle/release/app-release.aab

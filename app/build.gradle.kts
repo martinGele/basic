@@ -3,6 +3,11 @@ plugins {
     id("refactoring.android.compose")
     id("refactoring.android.hilt")
     id("refactoring.jacoco")
+    alias(libs.plugins.cyclonedx)
+}
+
+tasks.named("cyclonedxBom") {
+    notCompatibleWithConfigurationCache("CycloneDX plugin uses Configuration at execution time")
 }
 
 android {
@@ -31,7 +36,8 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
